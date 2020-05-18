@@ -3,51 +3,86 @@
 import java.util.Arrays;
 import java.util.List;
 
-
+/**
+ * This class represents a puzzle state. The class contains the puzzle, the correct state for this puzzle,
+ * list of the black tiles, list of the red tiles, the cost from the root puzzle until this state,
+ * the path from the root puzzle until this state, char of the last move, The row(zeroY) and 
+ * column(zeroX) of the empty tile.
+ * To this class have the ability to make the correct puzzle, to check if the puzzle equal to 
+ * the correct puzzle, to check the directions that the empty tile can move, to moving the empty tile,
+ * and convert to string our puzzle and the correct puzzle.
+ * 
+ * @author Itamar Ziv-On
+ *
+ */
 public class Puzzle {
-	private static int countOfPuzzles=0;
+	private int sumOfPuzzles;
 	private int pathLength;
 	private List<Integer> black;
 	private List<Integer> red;
+	private char lastMove;
 	private int cost;
-    public enum DIRECTION {LEFT, UP, RIGHT, DOWN }//operators
+	private String move;
+	private Puzzle father;
+    public static enum DIRECTION {LEFT, UP, RIGHT, DOWN }
     private final int[][] puzzle;
     private int[][] correctPuzzle;
-    private String path = "";
-    private int zeroX, zeroY;//The row(zeroY) and column(zeroX) of the empty tile 
+    private String path;
+    private int zeroX, zeroY;
+    private String puzzleString;
+    private boolean ifStringYet;
     
     
-    public Puzzle(int[][] puzzle, int[][] correctPuzzle) {
+    public Puzzle(int[][] puzzle) {
         this.puzzle = puzzle;
-        this.correctPuzzle = correctPuzzle;
+        this.correctPuzzle = generateCorrectPuzzle(puzzle.length , puzzle[0].length);
         pathLength=0;
         cost=0;
-//        black=new ArrayList<Integer>();
-//        red=new ArrayList<Integer>();
+        sumOfPuzzles=0;
+        path="";
+        black= null;
+        red= null;
+        father=null;
         findZeroTile();
-        countOfPuzzles++;
+        puzzleString="";
+        ifStringYet=false;
+        move="";
+//        countOfPuzzles++;
     }
     
+    public Puzzle(PuzzleLoader puzzle) {
+    	this(puzzle.getPuzzle());
+        black= puzzle.getBlack();
+        red= puzzle.getRed();
+//        countOfPuzzles++;
+    }
     
-    //Deep copy of newPuzzle
-    public Puzzle(Puzzle newPuzzle) {
-        puzzle = new int[newPuzzle.puzzle.length][newPuzzle.puzzle[0].length];
+    //Deep copy of father
+    public Puzzle(Puzzle father) {
+        puzzle = new int[father.puzzle.length][father.puzzle[0].length];
         for (int i = 0; i < puzzle.length; i++) {
-            puzzle[i] = Arrays.copyOf(newPuzzle.puzzle[i], puzzle[i].length);
+            puzzle[i] = Arrays.copyOf(father.puzzle[i], puzzle[i].length);
         }
-        correctPuzzle = newPuzzle.correctPuzzle;
-        zeroX = newPuzzle.zeroX;
-        zeroY = newPuzzle.zeroY;
-        path = newPuzzle.path;
-        pathLength=newPuzzle.pathLength;
-        black=newPuzzle.black;
-        red=newPuzzle.red;
-        cost=newPuzzle.cost;
-        countOfPuzzles++;
+        correctPuzzle = father.correctPuzzle;
+        zeroX = father.zeroX;
+        zeroY = father.zeroY;
+        path = father.path;
+        pathLength=father.pathLength;
+        black=father.black;
+        red=father.red;
+        cost=father.cost;
+        lastMove=father.lastMove;
+        sumOfPuzzles=father.sumOfPuzzles;
+        ifStringYet=false;
+        this.father=father;
+//        countOfPuzzles++;
     }
     
     
-    //This method check if puzzle is the goal puzzle(equal to correctPuzzle)
+    /**
+     * Checks if our puzzle is the goal puzzle(equal to correctPuzzle)
+     * @return true if is the goal puzzle, else false.
+     */
     public boolean isSolved() {
         for (int y = 0; y < puzzle.length; ++y) {
             for (int x = 0; x < puzzle[y].length; ++x) {
@@ -58,28 +93,52 @@ public class Puzzle {
         }
         return true;
     }
-   
+    /**
+     * Makes the correct puzzle according to the puzzle's size.
+     * @param ySize number of puzzle's rows
+     * @param xSize number of puzzle's columns
+     * @return the correct puzzle
+     */
+    private static int[][] generateCorrectPuzzle(int ySize, int xSize) {
+        int[][] correctPuzzle = new int[ySize][xSize];
+        int counter = 1;
+        for (int y = 0; y < ySize; ++y) {
+            for (int x = 0; x < xSize; ++x) {
+                correctPuzzle[y][x] = counter;
+                ++counter;
+            }
+        }
+        correctPuzzle[ySize - 1][xSize - 1] = 0;
+        return correctPuzzle;
+    }
     
-    //This method check to which direction the empty tile can move
+    /**
+     * Checks if the empty tile can move to the receive direction.
+     * Checks whether this direction does not return the puzzle to its previous state, 
+     * if the empty cell can be moved in that direction at all, and if the number to be 
+     * moved is not in the blacklist. 
+     * @param direction 
+     * @return true if can, else false.
+     */
     public boolean canMove(DIRECTION direction) {
         switch (direction) {
             case UP:
-                if (zeroY != 0 && (black==null || !black.contains(getTile(zeroY - 1,zeroX)))) {//If the empty tile not in the first row. 
+                if (lastMove != 'D' && zeroY != 0 && (black==null || !black.contains(getTile(zeroY - 1,zeroX)))) {//If the empty tile not in the first row. 
                     return true;
                 }
                 break;
             case DOWN:
-                if (zeroY != puzzle.length - 1 && (black==null || !black.contains(getTile(zeroY + 1,zeroX)))) {//If the empty tile not in the last row.
+                if (lastMove != 'U' && zeroY != puzzle.length - 1 && (black==null || !black.contains(getTile(zeroY + 1,zeroX)))) {//If the empty tile not in the last row.
                     return true;
                 }
                 break;
             case LEFT:
-                if (zeroX != 0 && (black==null || !black.contains(getTile(zeroY,zeroX-1)))) {//If the empty tile not in the first column.
+                if (lastMove != 'R' && zeroX != 0 && (black==null || !black.contains(getTile(zeroY,zeroX-1)))) {//If the empty tile not in the first column.
                     return true;
                 }
                 break;
             case RIGHT:
-                if (zeroX != puzzle[zeroY].length - 1 && (black==null || !black.contains(getTile(zeroY,zeroX+1)))) {//If the empty tile not in the last column.
+                if (lastMove != 'L' && zeroX != puzzle[zeroY].length - 1 && (black==null || !black.contains(getTile(zeroY,zeroX+1)))) {//If the empty tile not in the last column.
                     return true;
                 }
                 break;
@@ -94,7 +153,9 @@ public class Puzzle {
             case UP:
                 swap(zeroY, zeroX, (zeroY - 1), zeroX);
                 path += getTile(zeroY+1,zeroX)+"D-";
+                move=getTile(zeroY+1,zeroX)+"D";
                 pathLength++;
+                lastMove='U';
                 if(red!=null && red.contains(getTile(zeroY+1,zeroX)))
                 	cost+=30;
                 else 
@@ -103,7 +164,9 @@ public class Puzzle {
             case DOWN:
                 swap(zeroY, zeroX, (zeroY + 1), zeroX);
                 path += getTile(zeroY-1,zeroX)+"U-";
+                move=getTile(zeroY-1,zeroX)+"U";
                 pathLength++;
+                lastMove='D';
                 if(red!=null && red.contains(getTile(zeroY-1,zeroX)))
                 	cost+=30;
                 else 
@@ -112,7 +175,9 @@ public class Puzzle {
             case LEFT:
                 swap(zeroY, zeroX, zeroY, (zeroX - 1));
                 path += getTile(zeroY,zeroX+1)+"R-";
+                move=getTile(zeroY,zeroX+1)+"R";
                 pathLength++;
+                lastMove='L';
                 if(red!=null && red.contains(getTile(zeroY,zeroX+1)))
                 	cost+=30;
                 else 
@@ -121,7 +186,9 @@ public class Puzzle {
             case RIGHT:
                 swap(zeroY, zeroX, zeroY, (zeroX + 1));
                 path += getTile(zeroY,zeroX-1)+"L-";
+                move=getTile(zeroY,zeroX-1)+"L";
                 pathLength++;
+                lastMove='R';
                 if(red!=null && red.contains(getTile(zeroY,zeroX-1)))
                 	cost+=30;
                 else 
@@ -154,12 +221,16 @@ public class Puzzle {
         }
     }
     
-    public void setBlack(List<Integer> black) {
-    	this.black=black;
-    }
+//    public void setBlack(List<Integer> black) {
+//    	this.black=black;
+//    }
+//    
+//    public void setRed(List<Integer> red) {
+//    	this.red=red;
+//    }
     
-    public void setRed(List<Integer> red) {
-    	this.red=red;
+    public void setSumOfPuzzles(int sumOfPuzzles) {
+    	this.sumOfPuzzles = sumOfPuzzles;
     }
     
     public List<Integer> getBlack(){
@@ -170,12 +241,20 @@ public class Puzzle {
     	return red;
     }
     
-    public int getCount() {
-    	return countOfPuzzles;
+//    public int getCount() {
+//    	return countOfPuzzles;
+//    }
+    
+    public String getMove() {
+    	return move;
     }
     
     public int getPathLength() {
     	return pathLength;
+    }
+    
+    public int getSumOfPuzzles() {
+    	return sumOfPuzzles;
     }
     
     private void setTile(int y, int x, int tile) {
@@ -186,6 +265,10 @@ public class Puzzle {
         return puzzle[y][x];
     }
     
+    public Puzzle getFather() {
+    	return father;
+    }
+    
     public String getPath() {
         return path;
     }
@@ -194,12 +277,18 @@ public class Puzzle {
         return puzzle;
     }
     
+    public int[][] getCorrectPuzzle() {
+        return correctPuzzle;
+    }
+    
     public int getCost() {
     	return cost;
     }
     
     @Override
     public String toString() {
+    	if(ifStringYet==true)
+    		return puzzleString;
         StringBuilder output = new StringBuilder();
         for (int y = 0; y < puzzle.length; ++y) {
             for (int x = 0; x < puzzle[y].length; ++x) {
@@ -210,8 +299,11 @@ public class Puzzle {
             }
             output.append(System.lineSeparator());
         }
-        return output.toString();
+        ifStringYet=true;
+        puzzleString= output.toString();
+        return puzzleString;
     }
+    
     public String toStringCorrectPuzzle() {
         StringBuilder output = new StringBuilder();
         for (int y = 0; y < correctPuzzle.length; ++y) {
