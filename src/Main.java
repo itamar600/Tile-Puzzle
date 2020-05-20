@@ -12,8 +12,8 @@ public class Main {
         timeStart = System.nanoTime();
 //        Puzzle solvedPuzzle=Algorithms.BFS(puzzle,puzzleLoader.getOpen());
         Algorithms Solve=new Algorithms();
-        Puzzle solvedPuzzle=Solve.BFS(puzzle,puzzleLoader.getOpen());
-        Solve.DFID(puzzle,puzzleLoader.getOpen());
+        System.out.println(Solve.BFS(puzzle,puzzleLoader.getOpen()));
+        System.out.println(Solve.DFID(puzzle,puzzleLoader.getOpen()));
 //        Puzzle solvedPuzzle=Algorithms.DFID(puzzle,puzzleLoader.getOpen());
         timeStop = System.nanoTime();
         System.out.println(Solve.getPath()+ "\n"+Solve.getCost()+"\n"+ Solve.getCount());
@@ -25,32 +25,32 @@ public class Main {
 //        if(i==j)
 //        	test=true;
 //        System.out.println(test);
-        if(solvedPuzzle==null) {
-        	System.out.println("no path");
-        	return;
-        }
+       // if(solvedPuzzle==null) {
+//        	System.out.println("no path");
+//        	return;
+//        }
         System.out.println("------- AFTER -------");
-        System.out.println(solvedPuzzle);
-        System.out.println("Path: " + solvedPuzzle.getPath().substring(0,solvedPuzzle.getPath().length()-1));
+       // System.out.println(solvedPuzzle);
+        //System.out.println("Path: " + solvedPuzzle.getPath().substring(0,solvedPuzzle.getPath().length()-1));
         System.out.println("Path: " + Solve.getPath());
-        System.out.println("Path length: " + solvedPuzzle.getPathLength());
+       // System.out.println("Path length: " + solvedPuzzle.getPathLength());
         System.out.println("Solved in: " + ((timeStop - timeStart) / 1000) / 1000.0 + "ms");
         System.out.println("Solved in: " + (timeStop - timeStart)/ 1000000000.0 + "s");
         System.out.println("Algorithm: "+ puzzleLoader.getAlgorithm());
-        System.out.println("Black tiles: "+ solvedPuzzle.getBlack());
-        System.out.println("Red tiles: "+ solvedPuzzle.getRed());
-        System.out.println("Cost: "+ solvedPuzzle.getCost());
+//        System.out.println("Black tiles: "+ solvedPuzzle.getBlack());
+//        System.out.println("Red tiles: "+ solvedPuzzle.getRed());
+//        System.out.println("Cost: "+ solvedPuzzle.getCost());
         System.out.println("Time: "+ puzzleLoader.getTime() );
         System.out.println("Open: "+ puzzleLoader.getOpen() );
-        System.out.println("Sum of create: "+ solvedPuzzle.getSumOfPuzzles() );
-        saveToFile("output1.txt",solvedPuzzle,timeStop-timeStart);
+//        System.out.println("Sum of create: "+ solvedPuzzle.getSumOfPuzzles() );
+        saveToFile("output1.txt",Solve.BFS(puzzle,puzzleLoader.getOpen()),timeStop-timeStart);
     }
     
-    private static void saveToFile(String fileName, Puzzle puzzle, long time) {
+    private static void saveToFile(String fileName, String solve, long time) {
     	try 
 		{
 			PrintWriter pw = new PrintWriter(fileName);
-			pw.write(puzzle.getPath().substring(0,puzzle.getPath().length()-1)+"\nNum: "+ puzzle.getSumOfPuzzles()+"\nCost: " + puzzle.getCost() +"\n" + time/1000000000.+" seconds");
+			pw.write(solve+ "\n" + time/1000000000.+" seconds");
 			pw.close();
 		} 
 		catch (Exception e) 

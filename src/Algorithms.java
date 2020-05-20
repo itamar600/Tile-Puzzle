@@ -9,28 +9,30 @@ public class Algorithms {
 	private final Puzzle.DIRECTION[] strategy = {Puzzle.DIRECTION.RIGHT, Puzzle.DIRECTION.DOWN, Puzzle.DIRECTION.LEFT, Puzzle.DIRECTION.UP};
 	private int count;
 	private int cost;
+	private int[][] correctPuzzle;
 	private String path;
 	private boolean isOpen; 
 	public Algorithms() {
 		frontiers = new LinkedList<>();
 		count=0;
-		path="";
+		path="no path";
 		cost=0;
 		isOpen=false;
 	}
-	public Puzzle BFS(Puzzle puzzleToSolve, boolean isOpen) {
+	public String BFS(Puzzle puzzleToSolve, boolean isOpen) {
+		initData(puzzleToSolve, isOpen);
+		count++;
 		if(!checkTheBlack(puzzleToSolve)) 
-    		return null;
-		this.isOpen=isOpen;
+    		return toString();
 		HashMap<String, Puzzle> openList= new HashMap<String, Puzzle>();
 		HashMap<String, Puzzle> closeList= new HashMap<String, Puzzle>();
-	    count=1;
 	    frontiers.add(puzzleToSolve);
 	    openList.put(puzzleToSolve.toString(), puzzleToSolve);
 	    while (!frontiers.isEmpty()) {
 	    	if(this.isOpen)
 	    		System.out.println(frontiers+"\n\n");
 	    	Puzzle puzzle = frontiers.poll();
+	    	//System.out.println(puzzle+ ", "+heuristic(puzzle));
 	    	closeList.put(puzzle.toString(), puzzle);
 	    	openList.remove(puzzle.toString(), puzzle);
 	        for (int i = 0; i < strategy.length; i++) {
@@ -40,10 +42,10 @@ public class Algorithms {
 	                newPuzzle.move(strategy[i]);
 	                if(!openList.containsKey(newPuzzle.toString()) && !closeList.containsKey(newPuzzle.toString())) {
 	                	if (newPuzzle.isSolved()) {
-	                		System.out.println("Sum of puzzles: "+count);
-	                		newPuzzle.setSumOfPuzzles(++count);
+//	                		newPuzzle.setSumOfPuzzles(++count);
 	                		findPath(newPuzzle);
-	                		return newPuzzle;
+	                		cost=newPuzzle.getCost();
+	                		return toString();
 	                	}
 	                	else {
 	                		frontiers.add(newPuzzle);
@@ -53,9 +55,17 @@ public class Algorithms {
 	            }
 	        }
 	    }
-	    return null;
+	    return toString();
 	}
 	
+	 private void initData(Puzzle puzzle, boolean isOpen) {
+		frontiers.clear();
+		correctPuzzle = generateCorrectPuzzle(puzzle.getPuzzle().length , puzzle.getPuzzle()[0].length);
+		path="no path";
+		count=0;
+		cost=0;
+		this.isOpen=isOpen;
+	 }
 	 
 	 private boolean checkTheBlack(Puzzle puzzle) {
 	    	if(puzzle.getBlack()==null)
@@ -72,28 +82,42 @@ public class Algorithms {
 	    	}
 	    	return true;
 	    }
-	 public void DFID(Puzzle puzzleToSolve, boolean isOpen ) {
-		 if(!checkTheBlack(puzzleToSolve)) 
-	    		this.path="no path";
-		 this.isOpen=isOpen;
+	 
+	 private static int[][] generateCorrectPuzzle(int ySize, int xSize) {
+	        int[][] correctPuzzle = new int[ySize][xSize];
+	        int counter = 1;
+	        for (int y = 0; y < ySize; ++y) {
+	            for (int x = 0; x < xSize; ++x) {
+	                correctPuzzle[y][x] = counter;
+	                ++counter;
+	            }
+	        }
+	        correctPuzzle[ySize - 1][xSize - 1] = 0;
+	        return correctPuzzle;
+	    }
+	 
+	 public String DFID(Puzzle puzzleToSolve, boolean isOpen ) {
+		 initData(puzzleToSolve, isOpen);
+		 count++;
+		 if(!checkTheBlack(puzzleToSolve))  
+	    		return toString();
 		 HashMap<String, Puzzle> openList;
-		 count=1;
 //		 int[][] result={{-1}};
 //		 int[][] cutoff= {{0}};
 		 String cutoff="cutoff";
 		 String result="";
-		 Puzzle solve;
 		 for(int depth=1; depth<Integer.MAX_VALUE; depth++) {
 			 openList= new HashMap<String, Puzzle>();
 //			 solve=limited_DFS(puzzleToSolve, depth, openList);
 			 result=limited_DFS(puzzleToSolve, depth, openList);
 //			 if (solve.getPuzzle() != cutoff)
 //				 return solve;
-			 if(result==null || result!=cutoff) {
-				 return;
-			 }
+			 if(result==null ||  result!=cutoff)
+				 return toString();
+//			 else if( result!=cutoff)
+//				 return toString();
 		 }
-//		 return null;
+		 return toString();
 	 }
 	 
 	 private String limited_DFS(Puzzle puzzle,int depth,HashMap<String, Puzzle> openList) {
@@ -171,4 +195,47 @@ public class Algorithms {
 	 public int getCost() {
 		 return cost;
 	 }
+	 
+	 public String toString() {
+		 return path+ "\nNum: "+ count +"\nCost: "+ cost; 
+	 }
+	 
+	 private int heuristic(Puzzle puzzle) {
+		 int[][] matrix= puzzle.getPuzzle();
+		 int num, correctCol, correctRow, h=0;
+		 int rowSum= matrix.length;
+		 int colSum = matrix[0].length;
+		 for(int row=0; row<rowSum; row++) {
+			 for(int col=0; col<colSum; col++) {
+				 num=matrix[row][col];
+				 if(num==0 || (puzzle.getBlack()!=null && puzzle.getBlack().contains(num)))
+					 continue;
+				 correctRow= (num-1)/colSum;
+				 correctCol= (num-1)%colSum;
+				 if(matrix[correctRow][correctCol]==num)
+					 continue;
+				 if(puzzle.getRed().contains(num))
+					 h+=30*(Math.abs(row-correctRow)+Math.abs(col-correctCol));
+				 else 
+					 h+=Math.abs(row-correctRow)+Math.abs(col-correctCol);
+				 
+			 }
+				 
+		 }
+		 return h;
+	 }
+	 
+	 public String toStringCorrectPuzzle() {
+	        StringBuilder output = new StringBuilder();
+	        for (int y = 0; y < correctPuzzle.length; ++y) {
+	            for (int x = 0; x < correctPuzzle[y].length; ++x) {
+	            	if(correctPuzzle[y][x]==0)
+	            		output.append(" ");
+	            	else
+	            		output.append(correctPuzzle[y][x]).append(" ");
+	            }
+	            output.append(System.lineSeparator());
+	        }
+	        return output.toString();
+	    }
 }
