@@ -16,7 +16,7 @@ import java.util.List;
  *
  */
 public class Puzzle {
-	private int sumOfPuzzles;
+//	private int sumOfPuzzles;
 	private int pathLength;
 	private List<Integer> black;
 	private List<Integer> red;
@@ -27,10 +27,10 @@ public class Puzzle {
     public static enum DIRECTION {LEFT, UP, RIGHT, DOWN }
     private final int[][] puzzle;
     private int[][] correctPuzzle;
-    private String path;
+    //private String path;
     private int zeroX, zeroY;
     private String puzzleString;
-    private boolean ifStringYet;
+    private boolean ifStringYet,out;
     
     
     public Puzzle(int[][] puzzle) {
@@ -38,8 +38,8 @@ public class Puzzle {
         this.correctPuzzle = generateCorrectPuzzle(puzzle.length , puzzle[0].length);
         pathLength=0;
         cost=0;
-        sumOfPuzzles=0;
-        path="";
+        //sumOfPuzzles=0;
+        //path="";
         black= null;
         red= null;
         father=null;
@@ -47,6 +47,7 @@ public class Puzzle {
         puzzleString="";
         ifStringYet=false;
         move="";
+        out=false;
 //        countOfPuzzles++;
     }
     
@@ -66,15 +67,18 @@ public class Puzzle {
         correctPuzzle = father.correctPuzzle;
         zeroX = father.zeroX;
         zeroY = father.zeroY;
-        path = father.path;
+        //path = father.path;
         pathLength=father.pathLength;
         black=father.black;
         red=father.red;
         cost=father.cost;
         lastMove=father.lastMove;
-        sumOfPuzzles=father.sumOfPuzzles;
+        //sumOfPuzzles=father.sumOfPuzzles;
         ifStringYet=false;
         this.father=father;
+        out=false;
+        move="";
+        ifStringYet=false;
 //        countOfPuzzles++;
     }
     
@@ -152,7 +156,7 @@ public class Puzzle {
         switch (direction) {
             case UP:
                 swap(zeroY, zeroX, (zeroY - 1), zeroX);
-                path += getTile(zeroY+1,zeroX)+"D-";
+                //path += getTile(zeroY+1,zeroX)+"D-";
                 move=getTile(zeroY+1,zeroX)+"D";
                 pathLength++;
                 lastMove='U';
@@ -163,7 +167,7 @@ public class Puzzle {
                 break;
             case DOWN:
                 swap(zeroY, zeroX, (zeroY + 1), zeroX);
-                path += getTile(zeroY-1,zeroX)+"U-";
+                //path += getTile(zeroY-1,zeroX)+"U-";
                 move=getTile(zeroY-1,zeroX)+"U";
                 pathLength++;
                 lastMove='D';
@@ -174,7 +178,7 @@ public class Puzzle {
                 break;
             case LEFT:
                 swap(zeroY, zeroX, zeroY, (zeroX - 1));
-                path += getTile(zeroY,zeroX+1)+"R-";
+                //path += getTile(zeroY,zeroX+1)+"R-";
                 move=getTile(zeroY,zeroX+1)+"R";
                 pathLength++;
                 lastMove='L';
@@ -185,7 +189,7 @@ public class Puzzle {
                 break;
             case RIGHT:
                 swap(zeroY, zeroX, zeroY, (zeroX + 1));
-                path += getTile(zeroY,zeroX-1)+"L-";
+                //path += getTile(zeroY,zeroX-1)+"L-";
                 move=getTile(zeroY,zeroX-1)+"L";
                 pathLength++;
                 lastMove='R';
@@ -201,9 +205,9 @@ public class Puzzle {
     //This method is swapping puzzle[y1][x1] with puzzle[y2][x2] while puzzle[y1][x1] is the empty tile,
     //and update zeroY and zeroX.
     private void swap(int y1, int x1, int y2, int x2) {
-        int previous = getTile(y1, x1);
+        //int previous = getTile(y1, x1);
         setTile(y1, x1, getTile(y2, x2));
-        setTile(y2, x2, previous);
+        setTile(y2, x2, 0);
         zeroY = y2;
         zeroX = x2;
     }
@@ -229,9 +233,9 @@ public class Puzzle {
 //    	this.red=red;
 //    }
     
-    public void setSumOfPuzzles(int sumOfPuzzles) {
-    	this.sumOfPuzzles = sumOfPuzzles;
-    }
+//    public void setSumOfPuzzles(int sumOfPuzzles) {
+//    	this.sumOfPuzzles = sumOfPuzzles;
+//    }
     
     public List<Integer> getBlack(){
     	return black;
@@ -249,13 +253,17 @@ public class Puzzle {
     	return move;
     }
     
+    public char getLastMove() {
+    	return lastMove;
+    }
+    
     public int getPathLength() {
     	return pathLength;
     }
-    
-    public int getSumOfPuzzles() {
-    	return sumOfPuzzles;
-    }
+//    
+//    public int getSumOfPuzzles() {
+//    	return sumOfPuzzles;
+//    }
     
     private void setTile(int y, int x, int tile) {
         puzzle[y][x] = tile;
@@ -269,20 +277,28 @@ public class Puzzle {
     	return father;
     }
     
-    public String getPath() {
-        return path;
-    }
+//    public String getPath() {
+//        return path;
+//    }
     
     public int[][] getPuzzle() {
         return puzzle;
     }
     
-    public int[][] getCorrectPuzzle() {
-        return correctPuzzle;
-    }
+//    public int[][] getCorrectPuzzle() {
+//        return correctPuzzle;
+//    }
     
     public int getCost() {
     	return cost;
+    }
+    
+    public boolean isOut() {
+    	return out;
+    }
+    
+    public void setOut(boolean out) {
+    	this.out=out;
     }
     
     @Override
@@ -304,17 +320,17 @@ public class Puzzle {
         return puzzleString;
     }
     
-    public String toStringCorrectPuzzle() {
-        StringBuilder output = new StringBuilder();
-        for (int y = 0; y < correctPuzzle.length; ++y) {
-            for (int x = 0; x < correctPuzzle[y].length; ++x) {
-            	if(correctPuzzle[y][x]==0)
-            		output.append(" ");
-            	else
-            		output.append(correctPuzzle[y][x]).append(" ");
-            }
-            output.append(System.lineSeparator());
-        }
-        return output.toString();
-    }
+//    public String toStringCorrectPuzzle() {
+//        StringBuilder output = new StringBuilder();
+//        for (int y = 0; y < correctPuzzle.length; ++y) {
+//            for (int x = 0; x < correctPuzzle[y].length; ++x) {
+//            	if(correctPuzzle[y][x]==0)
+//            		output.append(" ");
+//            	else
+//            		output.append(correctPuzzle[y][x]).append(" ");
+//            }
+//            output.append(System.lineSeparator());
+//        }
+//        return output.toString();
+//    }
 }

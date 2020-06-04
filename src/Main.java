@@ -3,7 +3,7 @@ import java.io.PrintWriter;
 
 public class Main {
     public static void main(String[] args) {
-        PuzzleLoader puzzleLoader = new PuzzleLoader("input.txt");
+        PuzzleLoader puzzleLoader = new PuzzleLoader("input6.txt");
         Puzzle puzzle=new Puzzle(puzzleLoader);
         System.out.println("------- BEFORE -------");
         System.out.println(puzzle);
@@ -12,11 +12,14 @@ public class Main {
         timeStart = System.nanoTime();
 //        Puzzle solvedPuzzle=Algorithms.BFS(puzzle,puzzleLoader.getOpen());
         Algorithms Solve=new Algorithms();
-        System.out.println(Solve.BFS(puzzle,puzzleLoader.getOpen()));
-        System.out.println(Solve.DFID(puzzle,puzzleLoader.getOpen()));
+        System.out.println("BFS:\n"+Solve.BFS(puzzle,puzzleLoader.getOpen()));
+        System.out.println("DFID:\n"+Solve.DFID(puzzle,puzzleLoader.getOpen()));
+        System.out.println("IDA*:\n"+Solve.IDA(puzzle,puzzleLoader.getOpen()));
+        System.out.println("A*:\n"+Solve.A(puzzle,puzzleLoader.getOpen()));
+        System.out.println("DFBnB:\n"+Solve.DFBnB(puzzle,puzzleLoader.getOpen()));
 //        Puzzle solvedPuzzle=Algorithms.DFID(puzzle,puzzleLoader.getOpen());
         timeStop = System.nanoTime();
-        System.out.println(Solve.getPath()+ "\n"+Solve.getCost()+"\n"+ Solve.getCount());
+        //System.out.println(Solve.getPath()+ "\n"+Solve.getCost()+"\n"+ Solve.getCount());
 //        int[][] i= {{1},{2},{3},{4}};
 //        int[][] j= {{1},{2},{3},{4}};
 //        boolean test= false;
