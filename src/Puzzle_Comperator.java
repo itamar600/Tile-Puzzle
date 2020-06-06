@@ -10,20 +10,20 @@ public class Puzzle_Comperator implements Comparator<Puzzle> {
 			if(dp!=0) {
 				return dp;
 			}
-			dp=p1.getPathLength()-p2.getPathLength();
+			dp=p1.getDepth()-p2.getDepth();
 			if(dp!=0)
 				return dp;
-			if(p1.getLastMove()=='R')
+			if(p1.getLastMove()=='R' && p2.getLastMove()!='R')
 				return -1;
-			if(p2.getLastMove()=='R')
+			if(p2.getLastMove()=='R' && p1.getLastMove()!='R')
 				return 1;
-			if(p1.getLastMove()=='D')
+			if(p1.getLastMove()=='D' && p2.getLastMove()!='D')
 				return -1;
-			if(p2.getLastMove()=='D')
+			if(p2.getLastMove()=='D' && p1.getLastMove()!='D')
 				return 1;
-			if(p1.getLastMove()=='L')
+			if(p1.getLastMove()=='L' && p2.getLastMove()!='L')
 				return -1;
-			if(p2.getLastMove()=='L')
+			if(p2.getLastMove()=='L' && p1.getLastMove()!='L')
 				return 1;
 			return 0;
 		}

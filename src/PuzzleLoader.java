@@ -4,7 +4,11 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * 
+ * @author Itamar Ziv-On
+ *
+ */
 public class PuzzleLoader {
 	private String algorithm;
 	private List<Integer> black;
@@ -16,7 +20,6 @@ public class PuzzleLoader {
     public PuzzleLoader(String fileName) {
         BufferedReader br;
         String line1, line2, line3, line4, line5, line6, matrixRow;
-//        String [] cvsSplitBy = {",",":"," ","x"};
         try {
             br = new BufferedReader(new FileReader(fileName));
             line1 = br.readLine();
@@ -96,38 +99,3 @@ public class PuzzleLoader {
     
 }
 
-
-
-//public int[][] load(String fileName) {
-//    int[][] puzzle;
-//    BufferedReader br;
-//    String line, line1, line2, line3, line4, line5, line6;
-//    String cvsSplitBy = ",";
-//    try {
-//        br = new BufferedReader(new FileReader(fileName));
-//        line1 = br.readLine();
-//        line2 = br.readLine();
-//        line3 = br.readLine();
-//        line4 = br.readLine();
-//        line5 = br.readLine();
-//        line6 = br.readLine();
-//        algorithm=line1;
-//        
-//        String[] size = line4.split(cvsSplitBy);
-//        puzzle = new int[Integer.parseInt(size[0])][Integer.parseInt(size[1])];
-//        int puzzleLine = 0;
-//        while ((line = br.readLine()) != null) {
-//            String[] tiles = line.split(cvsSplitBy);
-//            for (int i = 0; i < puzzle[0].length; ++i) {
-//                puzzle[puzzleLine][i] = Integer.parseInt(tiles[i]);
-//            }
-//            ++puzzleLine;
-//        }
-//        br.close();
-//        return puzzle;
-//    } catch (Exception e) {
-//        e.printStackTrace();
-//    }
-//    return null;
-//}
-//}

@@ -4,7 +4,12 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Stack;
-
+/**
+ * This class represents algorithms for calculating tile puzzle with colors, each algorithm gets a starting puzzle and if to print the open list and 
+ * returns a string that includes the path to solve, if any, how many puzzles were created and what the cost of the path.
+ * @author itamar Ziv On
+ *
+ */
 public class Algorithms {
 
 	private final Puzzle.DIRECTION[] strategy = {Puzzle.DIRECTION.RIGHT, Puzzle.DIRECTION.DOWN, Puzzle.DIRECTION.LEFT, Puzzle.DIRECTION.UP};
@@ -22,7 +27,12 @@ public class Algorithms {
 		isOpen=false;
 	}
 	
-	
+	/**
+	 * 
+	 * @param puzzleToSolve
+	 * @param isOpen
+	 * @return
+	 */
 	public String BFS(Puzzle puzzleToSolve, boolean isOpen) {
 		initData(puzzleToSolve, isOpen);
 		count++;
@@ -65,7 +75,12 @@ public class Algorithms {
 	}
 	
 	 
-	 
+	 /**
+	  * 
+	  * @param puzzleToSolve
+	  * @param isOpen
+	  * @return
+	  */
 	 public String DFID(Puzzle puzzleToSolve, boolean isOpen ) {
 		 initData(puzzleToSolve, isOpen);
 		 count++;
@@ -82,7 +97,13 @@ public class Algorithms {
 		 }
 		 return toString();
 	 }
-	 
+	 /**
+	  * 
+	  * @param puzzle
+	  * @param depth
+	  * @param openList
+	  * @return
+	  */
 	 private String limited_DFS(Puzzle puzzle,int depth,HashMap<String, Puzzle> openList) {
 		 if(isSolved(puzzle)) {
 //			 return puzzle;
@@ -103,7 +124,7 @@ public class Algorithms {
 	                newPuzzle.move(strategy[i]);
 	                if(!openList.containsKey(newPuzzle.toString())) {
 	                	result= limited_DFS(newPuzzle, depth-1, openList);
-	                	if(result!= null && result=="cutoff")
+	                	if(result!= null && result.equals("cutoff"))
 	                		isCutoff=true;
 	                	else if(result!=null)
 	                		return result;
@@ -125,7 +146,12 @@ public class Algorithms {
 		 return null;
 	 }
 	 
-	 
+	 /**
+	  * 
+	  * @param puzzleToSolve
+	  * @param isOpen
+	  * @return
+	  */
 	 public String A(Puzzle puzzleToSolve, boolean isOpen){
 		initData(puzzleToSolve, isOpen);
 		count++;
@@ -173,6 +199,12 @@ public class Algorithms {
 		return toString();
 	 }
 	 
+	 /**
+	  * 
+	  * @param puzzleToSolve
+	  * @param isOpen
+	  * @return
+	  */
 	 public String IDA(Puzzle puzzleToSolve, boolean isOpen){
 		 initData(puzzleToSolve, isOpen);
 		 count++;
@@ -243,7 +275,12 @@ public class Algorithms {
 	 }
 	
 	 
-	 
+	 /**
+	  * 
+	  * @param puzzleToSolve
+	  * @param isOpen
+	  * @return
+	  */
 	 public String DFBnB(Puzzle puzzleToSolve, boolean isOpen) {
 		 initData(puzzleToSolve, isOpen);
 		 count++;
@@ -347,18 +384,27 @@ public class Algorithms {
       ///////////////////////
         ////FOR ALL/////
      //////////////////////
+	 	
 	 
-	 private void initData(Puzzle puzzle, boolean isOpen) {
-			correctPuzzle = generateCorrectPuzzle(puzzle.getPuzzle().length , puzzle.getPuzzle()[0].length);
-//			System.out.println("correct\n"+toStringCorrectPuzzle());
-//	        correctPuzzle[1][-1]=2;
+	   /**
+	 	 * Initialize the variables at the beginning of each algorithm.
+	 	 * @param puzzle- the puzzle to solve, needed for generate the correct puzzle.
+	 	 * @param isOpen
+	 	 */
+	 	private void initData(Puzzle puzzle, boolean isOpen) {
+			generateCorrectPuzzle(puzzle.getPuzzle().length , puzzle.getPuzzle()[0].length);
 			path="no path";
 			count=0;
 			cost=0;
 			this.isOpen=isOpen;
 		 }
 		 
-		 private boolean blackCheck(Puzzle puzzle) {
+	    /**
+	     * Checks if the numbers in the black are in the correct position otherwise the puzzle cannot be solved.
+	     * @param puzzle
+	     * @return
+	     */
+	 	private boolean blackCheck(Puzzle puzzle) {
 		    	if(puzzle.getBlack()==null)
 		    		return true;
 		    	for(int n: puzzle.getBlack()) {
@@ -374,7 +420,12 @@ public class Algorithms {
 		    	return true;
 		    }
 		 
-		 private static int[][] generateCorrectPuzzle(int ySize, int xSize) {
+	 	 /**
+	 	  * Generate the correct puzzle.
+	 	  * @param ySize- number of rows
+	 	  * @param xSize- number of columns
+	 	  */
+		 private void generateCorrectPuzzle(int ySize, int xSize) {
 		        int[][] correctPuzzle = new int[ySize][xSize];
 		        int counter = 1;
 		        for (int y = 0; y < ySize; ++y) {
@@ -384,12 +435,12 @@ public class Algorithms {
 		            }
 		        }
 		        correctPuzzle[ySize - 1][xSize - 1] = 0;
-		        return correctPuzzle;
+		        this.correctPuzzle=correctPuzzle;
 		    }
 		 
 		 /**
 		     * Checks if our puzzle is the goal puzzle(equal to correctPuzzle)
-		     * @return true if is the goal puzzle, else false.
+		     * @return true if it is the goal puzzle, else false.
 		     */
 		 private boolean isSolved(Puzzle puzzle) {
 		        for (int y = 0; y < puzzle.getPuzzle().length; ++y) {
@@ -408,7 +459,10 @@ public class Algorithms {
        /////////////////////////////////
 		 
 		 
-		 
+		 /**
+		  * Find the way we came to a solution by ascending the tree until it reached the root.
+		  * @param puzzle- the puzzle of the goal we reached
+		  */
 		 private void findPath(Puzzle puzzle) {
 			 if(puzzle== null) {
 				 this.path="no path";
@@ -435,9 +489,12 @@ public class Algorithms {
         ////PATH FOR IDA* AND DFBnB////
         ///////////////////////////////
 	 
-	 private void findPathOut(Stack<Puzzle> frontiers, Puzzle puzzle) {
-//		 Puzzle puzzle;
-		 //System.out.println(frontiers);
+	  /**
+	   * Finding the way to solve by the puzzles marked out in the stack.
+	   * @param frontiers
+	   * @param puzzle- the puzzle of the goal we reached. Not in the stack
+	   */
+	  private void findPathOut(Stack<Puzzle> frontiers, Puzzle puzzle) {
 		 Stack<Puzzle> temp= new Stack<Puzzle>();
 		 temp.addAll(frontiers);
 		 ArrayList<String> moves= new ArrayList<String>();
@@ -462,7 +519,12 @@ public class Algorithms {
 	   ///HEURISTIC FUNCTION///
 	   /////////////////////////
 	 
-	 
+	 /**
+	  * A heuristic function, built on calculating Manhattan distance according to the colors of the numbers.
+	  * @param puzzle
+	  * @return the heuristic number of puzzle
+	  * The method "public static" for Puzzle_Comperator.
+	  */
 	 public static int heuristic(Puzzle puzzle) {
 		 int[][] matrix= puzzle.getPuzzle();
 		 int num, correctCol, correctRow, h=0;
@@ -493,7 +555,12 @@ public class Algorithms {
        ////FOR IDA*/////
     //////////////////////
 	
-	 
+	 /**
+	  * Initialize the variables at the beginning of each iteration.
+	  * @param frontiers
+	  * @param openList
+	  * @param puzzleToSolve
+	  */
 	 private void initIDA(Stack<Puzzle> frontiers, HashMap<String, Puzzle> openList, Puzzle puzzleToSolve){
 		 puzzleToSolve.setOut(false);
 		 frontiers.clear();
@@ -508,7 +575,11 @@ public class Algorithms {
 	   ////FOR DFBnB/////
 	 //////////////////////
 	 
-	 
+	 /**
+	  * Creates an array of father's children according to their f-value in increasing order
+	  * @param father
+	  * @return the array of the children 
+	  */
 	 private ArrayList<Puzzle> childrenArr(Puzzle father){
 		 PriorityQueue<Puzzle> children=new PriorityQueue<Puzzle>(4,new Puzzle_Comperator());
 		 ArrayList<Puzzle> childrenArr=new ArrayList<Puzzle>();
@@ -526,6 +597,12 @@ public class Algorithms {
 		 return childrenArr;
 	 }
 	 
+	 
+	 /**
+	  * Reverse the array of children.
+	  * @param children
+	  * @return the reverse array
+	  */
 	 private ArrayList<Puzzle> reverseChildren(ArrayList<Puzzle> children){
 	        int size=children .size();
 	        ArrayList<Puzzle> temp= new ArrayList<Puzzle>();
@@ -536,6 +613,10 @@ public class Algorithms {
 	        
 		 }
 	 
+	 /**
+	  * Calculates the initial threshold. 
+	  * @return If the number of slots in correctPuzzle is greater than 12 return Integer.MAX_VALUE, otherwise returns n!.
+	  */
 	 private int tForStart() {
 		 int n=correctPuzzle.length*correctPuzzle[0].length;
 		 int factorialN=1;
@@ -552,15 +633,23 @@ public class Algorithms {
                                   ///////////////////////////////////////////////////////////////////////////////
                                         ///////////////////////////GETTERS/////////////////////////////////////
                                  ///////////////////////////////////////////////////////////////////////////////
-	 
+	 /**
+	  * @return the path to the solution 
+	  */
 	 public String getPath() {
 		 return path;
 	 }
 	 
+	 /**
+	  * @return the number of puzzles that created 
+	  */
 	 public int getCount() {
 		 return count;
 	 }
 	 
+	 /**
+	  * @return the cost of the path to the solution.
+	  */
 	 public int getCost() {
 		 return cost;
 	 }
@@ -572,13 +661,19 @@ public class Algorithms {
                                ///////////////////////////////////////////////////////////////////////////////
 	 
 	 
+	 /**
+	  * @return String. If path not found, return "no path" and the number of puzzles that created, otherwise return the path + number of puzzles that created
+	  * + the cost of the path.
+	  */
 	 public String toString() {
-		 if(path=="no path")
+		 if(path.equals("no path"))
 			 return  path+ "\nNum: "+ count;
 		 return path+ "\nNum: "+ count +"\nCost: "+ cost; 
 	 }
 	 
-	 
+	 /**
+	  * @return String of the correct puzzle.
+	  */
 	 public String toStringCorrectPuzzle() {
 	        StringBuilder output = new StringBuilder();
 	        for (int y = 0; y < correctPuzzle.length; ++y) {
