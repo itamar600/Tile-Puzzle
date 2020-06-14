@@ -7,7 +7,7 @@ import java.util.Stack;
 /**
  * This class represents algorithms for calculating tile puzzle with colors, each algorithm gets a starting puzzle and if to print the open list and 
  * returns a string that includes the path to solve, if any, how many puzzles were created and what the cost of the path.
- * @author itamar Ziv On
+ * @author Itamar Ziv-On
  *
  */
 public class Algorithms {
@@ -27,44 +27,57 @@ public class Algorithms {
 		isOpen=false;
 	}
 	
+	
+	
+	                           ////////////////////////////////////////////////////////////
+	                           //////////////////THE ALGORITHMS////////////////////////////
+	                           ////////////////////////////////////////////////////////////
+	
+	
+	
+	/////////////////////
+	///////BFS///////////
+	/////////////////////
+	
+	
 	/**
-	 * 
-	 * @param puzzleToSolve
-	 * @param isOpen
-	 * @return
+	 * BFS algorithm that goes over all options in breadth search until it is resolved. 
+	 * If some puzzle state is already in the open list or in the close one,
+	 * the algorithm does not develop it again.
+	 * @param puzzleToSolve- the puzzle state to solve.
+	 * @param isOpen- if to print the open list in each iteration or not.
+	 * @return string with information about the solution of the puzzle.
 	 */
 	public String BFS(Puzzle puzzleToSolve, boolean isOpen) {
 		initData(puzzleToSolve, isOpen);
 		count++;
 		if(!blackCheck(puzzleToSolve)) 
     		return toString();
-		Queue<Puzzle> frontiers = new LinkedList<>();
+		Queue<Puzzle> qPuzzles = new LinkedList<>();
 		HashMap<String, Puzzle> openList= new HashMap<String, Puzzle>();
 		HashMap<String, Puzzle> closeList= new HashMap<String, Puzzle>();
-	    frontiers.add(puzzleToSolve);
+		qPuzzles.add(puzzleToSolve);
 	    openList.put(puzzleToSolve.toString(), puzzleToSolve);
-	    while (!frontiers.isEmpty()) {
+	    while (!qPuzzles.isEmpty()) {
 	    	if(this.isOpen)
-	    		System.out.println(frontiers+"\n\n");
-	    	Puzzle puzzle = frontiers.poll();
-	    	//System.out.println(puzzle+ ", "+heuristic(puzzle));
+	    		System.out.println(qPuzzles+"\n\n");
+	    	Puzzle puzzle = qPuzzles.poll();
 	    	closeList.put(puzzle.toString(), puzzle);
 	    	openList.remove(puzzle.toString(), puzzle);
 	        for (int i = 0; i < strategy.length; i++) {
 	        	if (puzzle.canMove(strategy[i])) {
-	        		Puzzle newPuzzle = new Puzzle(puzzle);
-	                count++;
-	                newPuzzle.move(strategy[i]);
+	        		Puzzle newPuzzle=newState(new Puzzle(puzzle), strategy[i]);
+//	        		Puzzle newPuzzle = new Puzzle(puzzle);
+//	                count++;
+//	                newPuzzle.move(strategy[i]);
 	                if(!openList.containsKey(newPuzzle.toString()) && !closeList.containsKey(newPuzzle.toString())) {
-//	                	if (newPuzzle.isSolved()) {
-//	                		newPuzzle.setSumOfPuzzles(++count);
 	                	if (isSolved(newPuzzle)) {
 	                		findPath(newPuzzle);
 	                		cost=newPuzzle.getCost();
 	                		return toString();
 	                	}
 	                	else {
-	                		frontiers.add(newPuzzle);
+	                		qPuzzles.add(newPuzzle);
 	                		openList.put(newPuzzle.toString(), newPuzzle);
 	                	}
 	                }
@@ -74,99 +87,110 @@ public class Algorithms {
 	    return toString();
 	}
 	
+	
+	
+	////////////////////
+	////////DFID////////
+	////////////////////
 	 
 	 /**
-	  * 
-	  * @param puzzleToSolve
-	  * @param isOpen
-	  * @return
+	  * DFID algorithm An algorithm is built on DFS depth search, 
+	  * the depth it allows starts at 1 to infinity, 
+	  * with each iteration increasing by 1. In this implementation, 
+	  * the search is done recursively and there is a prevent from 
+	  * developing a puzzle state that is similar to state in the open list.
+	  * @param puzzleToSolve- the puzzle state to solve.
+	  * @param isOpen- if to print the open list in each iteration or not.
+	  * @return string with information about the solution of the puzzle.
 	  */
 	 public String DFID(Puzzle puzzleToSolve, boolean isOpen ) {
 		 initData(puzzleToSolve, isOpen);
 		 count++;
 		 if(!blackCheck(puzzleToSolve))  
 	    		return toString();
-		 HashMap<String, Puzzle> openList;
+		 HashMap<String, Puzzle> openList= new HashMap<String, Puzzle>();
 		 String cutoff="cutoff";
 		 String result="";
 		 for(int depth=1; depth<Integer.MAX_VALUE; depth++) {
-			 openList= new HashMap<String, Puzzle>();
+			 openList.clear();
 			 result=limited_DFS(puzzleToSolve, depth, openList);
-			 if(result==null ||  result!=cutoff)
+			 if(result==null ||  !result.equals(cutoff))
 				 return toString();
 		 }
 		 return toString();
 	 }
+	 
 	 /**
-	  * 
-	  * @param puzzle
-	  * @param depth
-	  * @param openList
-	  * @return
+	  * Recursive DFS with loop avoidance.
+	  * @param puzzle- the puzzle state to solve.
+	  * @param depth- depth limit.
+	  * @param openList- a list of puzzles that will develop.
+	  * @return if the puzzle solved return the path to the solution,
+	  * otherwise if came to the limit return "cutoff", otherwise return null.    
 	  */
 	 private String limited_DFS(Puzzle puzzle,int depth,HashMap<String, Puzzle> openList) {
 		 if(isSolved(puzzle)) {
-//			 return puzzle;
 			 this.cost=puzzle.getCost();
 			 findPath(puzzle);
 			 return path;
 		 }
 		 if (depth==0)
 		 	return "cutoff";
-//			 return puzzle;
 		 String result;
 		 openList.put(puzzle.toString(), puzzle);
 		 boolean isCutoff=false;
 		 for (int i = 0; i < strategy.length; i++) {
 	        	if (puzzle!= null && puzzle.canMove(strategy[i])) {
-	        		Puzzle newPuzzle = new Puzzle(puzzle);
-	                count++;
-	                newPuzzle.move(strategy[i]);
+	        		Puzzle newPuzzle=newState(new Puzzle(puzzle), strategy[i]);
+//	        		Puzzle newPuzzle = new Puzzle(puzzle);
+//	                count++;
+//	                newPuzzle.move(strategy[i]);
 	                if(!openList.containsKey(newPuzzle.toString())) {
 	                	result= limited_DFS(newPuzzle, depth-1, openList);
 	                	if(result!= null && result.equals("cutoff"))
 	                		isCutoff=true;
 	                	else if(result!=null)
 	                		return result;
-//	                	if(puzzle!=null) {
-//	                		if(puzzle.isSolved())
-//	                			return puzzle;
-//	                		isCutoff=true;
-//	                	}
 	                }
 	        	}
 		 }
-//		 if(puzzle!= null)
 		 if(isOpen)
 			 System.out.println(openList.keySet()+"\n\n");
 		 openList.remove(puzzle.toString(), puzzle);
 		 if(isCutoff==true)
 			 return "cutoff";
-//			 return puzzle;
 		 return null;
 	 }
 	 
+	 
+	 
+	 /////////////////////
+	 //////////A*/////////
+	 /////////////////////
+	 
+	 
 	 /**
-	  * 
-	  * @param puzzleToSolve
-	  * @param isOpen
-	  * @return
+	  *  A* algorithm, chooses to develop the puzzles by the amount of their
+	  * cost so far starting from the root and the heuristic function.
+	  * @param puzzleToSolve- the puzzle state to solve.
+	  * @param isOpen- if to print the open list in each iteration or not.
+	  * @return string with information about the solution of the puzzle.
 	  */
 	 public String A(Puzzle puzzleToSolve, boolean isOpen){
 		initData(puzzleToSolve, isOpen);
 		count++;
 		if(!blackCheck(puzzleToSolve)) 
 			return toString();
-		PriorityQueue<Puzzle> frontiers=new PriorityQueue<Puzzle>(new Puzzle_Comperator());
+		PriorityQueue<Puzzle> pQPuzzles=new PriorityQueue<Puzzle>(new Puzzle_Comperator());
 		HashMap<String, Puzzle> openList= new HashMap<String, Puzzle>();
 		HashMap<String, Puzzle> closeList= new HashMap<String, Puzzle>();
-		frontiers.add(puzzleToSolve);
+		pQPuzzles.add(puzzleToSolve);
 		openList.put(puzzleToSolve.toString(), puzzleToSolve);
 		Puzzle puzzle;
-		while(!frontiers.isEmpty()) {
+		while(!pQPuzzles.isEmpty()) {
 			if(isOpen)
 				 System.out.println(openList.keySet()+"\n\n");
-			puzzle=frontiers.poll();
+			puzzle=pQPuzzles.poll();
 			openList.remove(puzzle.toString(), puzzle);
 			if(isSolved(puzzle)) {
 				this.cost=puzzle.getCost();
@@ -176,20 +200,21 @@ public class Algorithms {
 			closeList.put(puzzle.toString(), puzzle);
 			for (int i = 0; i < strategy.length; i++) {
 				 if (puzzle!= null && puzzle.canMove(strategy[i])) {
-		        		Puzzle newPuzzle = new Puzzle(puzzle);
-		                count++;
-		                newPuzzle.move(strategy[i]);
+					 	Puzzle newPuzzle=newState(new Puzzle(puzzle), strategy[i]);
+//		        		Puzzle newPuzzle = new Puzzle(puzzle);
+//		                count++;
+//		                newPuzzle.move(strategy[i]);
 		                if(!openList.containsKey(newPuzzle.toString()) && !closeList.containsKey(newPuzzle.toString())) {
-		                	frontiers.add(newPuzzle);
+		                	pQPuzzles.add(newPuzzle);
 		            		openList.put(newPuzzle.toString(), newPuzzle);
 		                }
 		                else if(openList.containsKey(newPuzzle.toString())) {
 		                	Puzzle temp;
 		                	temp=openList.get(newPuzzle.toString());
 		                	if(heuristic(newPuzzle)+newPuzzle.getCost()<heuristic(temp)+temp.getCost()) {
-		                		frontiers.remove(temp);
+		                		pQPuzzles.remove(temp);
 		                		openList.remove(temp.toString(), temp);
-		                		frontiers.add(newPuzzle);
+		                		pQPuzzles.add(newPuzzle);
 			            		openList.put(newPuzzle.toString(), newPuzzle);
 		                	}
 		                }
@@ -199,46 +224,54 @@ public class Algorithms {
 		return toString();
 	 }
 	 
+	 
+	 
+	 
+	 /////////////////////
+	 /////////IDA*////////
+	 /////////////////////
+	 
+	 
 	 /**
-	  * 
-	  * @param puzzleToSolve
-	  * @param isOpen
-	  * @return
+	  * IDA* algorithm, which limits the development of puzzles by threshold 
+	  * determined by the heuristic function and the cost of puzzle development so far.
+	  * As long as we do not find the solution threshold rises to a minimum cost 
+	  * of a puzzle by its cost and heuristic function that is greater than the threshold.
+	  * @param puzzleToSolve- the puzzle state to solve.
+	  * @param isOpen- if to print the open list in each iteration or not.
+	  * @return string with information about the solution of the puzzle.
 	  */
 	 public String IDA(Puzzle puzzleToSolve, boolean isOpen){
 		 initData(puzzleToSolve, isOpen);
 		 count++;
 		 if(!blackCheck(puzzleToSolve))  
 	    		return toString();
+		 //if run on puzzleToSolve DFBnB before.
+		 puzzleToSolve.setOut(false);
 		 int minF;
-		 Stack<Puzzle> frontiers=new Stack<Puzzle>();
+		 Stack<Puzzle> sPuzzles=new Stack<Puzzle>();
 		 HashMap<String, Puzzle> openList= new HashMap<String,Puzzle>();
 		 Puzzle puzzle, temp;
 		 int f, t= heuristic(puzzleToSolve);
 		 while(t!=Integer.MAX_VALUE) {
 			 minF=Integer.MAX_VALUE;
-			 initIDA(frontiers,openList, puzzleToSolve);
-//			 frontiers.clear();
-//			 openList.clear();
-//			 frontiers.add(puzzleToSolve);
-//			 openList.put(puzzleToSolve.toString(), puzzleToSolve);
-			 while(!frontiers.isEmpty()) {
-				 if(isOpen)
-					 System.out.println(openList.keySet()+"\n\n");
-				 puzzle=frontiers.pop();
+			 initIDA(sPuzzles,openList, puzzleToSolve);
+			 while(!sPuzzles.isEmpty()) {
+				 puzzle=sPuzzles.pop();
 				 if(puzzle.isOut()) {
+					 if(isOpen)
+						 System.out.println(openList.keySet()+"\n\n");
 					 openList.remove(puzzle.toString(), puzzle);
-					 //System.out.println("out\n"+puzzle);
 				 }
 				 else {
-					 //System.out.println("not out\n"+puzzle);
 					 puzzle.setOut(true);
-					 frontiers.push(puzzle);
+					 sPuzzles.push(puzzle);
 					 for (int i = 0; i < strategy.length; i++) {
 						 if (puzzle!= null && puzzle.canMove(strategy[i])) {
-				        		Puzzle newPuzzle = new Puzzle(puzzle);
-				                count++;
-				                newPuzzle.move(strategy[i]);
+							 	Puzzle newPuzzle=newState(new Puzzle(puzzle), strategy[i]);
+//				        		Puzzle newPuzzle = new Puzzle(puzzle);
+//				                count++;
+//				                newPuzzle.move(strategy[i]);
 				                f=newPuzzle.getCost()+heuristic(newPuzzle);
 				                if(f>t) {
 				                	minF=Math.min(minF, f);
@@ -249,20 +282,18 @@ public class Algorithms {
 				                	if(temp.isOut())
 				                		continue;
 				                	if(temp.getCost()+heuristic(temp)>f) {
-				                		frontiers.remove(temp);
+				                		sPuzzles.remove(temp);
 				                		openList.remove(temp.toString(), temp);
 				                	}
 				                	else 
 				                		continue;
 				                }
 				                if(isSolved(newPuzzle)) {
-				                	//System.out.println("open list\n"+openList);
-				                	findPathOut(frontiers, newPuzzle);
-				                	//findPath(newPuzzle);
+				                	findPathOut(sPuzzles, newPuzzle);
 				                	cost=newPuzzle.getCost();
 				                	return toString();
 				                }
-				                frontiers.push(newPuzzle);
+				                sPuzzles.push(newPuzzle);
 				                openList.put(newPuzzle.toString(), newPuzzle);
 						 } 
 					 }
@@ -275,101 +306,88 @@ public class Algorithms {
 	 }
 	
 	 
+	 
+	 //////////////////////
+	 ////////DFBnB/////////
+	 //////////////////////
+	 
+	 
+	 
 	 /**
-	  * 
-	  * @param puzzleToSolve
-	  * @param isOpen
-	  * @return
+	  * The DFBnB algorithm starts with a high threshold and finds a solution,
+	  * and according to the solution it reduces the threshold to the solution
+	  * cost. For each puzzle it develops, develop all possible
+	  * developments to this puzzle and sorts them according to their cost so far
+	  * and the heuristic function in increase order.
+	  * @param puzzleToSolve- the puzzle state to solve.
+	  * @param isOpen- if to print the open list in each iteration or not.
+	  * @return string with information about the solution of the puzzle.
 	  */
 	 public String DFBnB(Puzzle puzzleToSolve, boolean isOpen) {
 		 initData(puzzleToSolve, isOpen);
 		 count++;
 		 if(!blackCheck(puzzleToSolve))  
 	    		return toString();
+		//if run on puzzleToSolve IDA before.
 		 puzzleToSolve.setOut(false);
-		 //Integer.MAX_VALUE;
 		 int f, t;
 		 t=tForStart();
 		 Puzzle puzzle,child, temp;
-		 Stack<Puzzle> frontiers=new Stack<Puzzle>();
+		 Stack<Puzzle> sPuzzles=new Stack<Puzzle>();
 		 HashMap<String, Puzzle> openList= new HashMap<String, Puzzle>();
-//		 PriorityQueue<Puzzle> children=new PriorityQueue<Puzzle>(3,new Puzzle_Comperator());
-		 frontiers.push(puzzleToSolve);
+		 sPuzzles.push(puzzleToSolve);
 		 openList.put(puzzleToSolve.toString(), puzzleToSolve);
 		 ArrayList<Puzzle> children=new ArrayList<Puzzle>();
-		 while(!frontiers.isEmpty()) {
-			if(isOpen)
-				 System.out.println(openList.keySet()+"\n\n");
-			puzzle=frontiers.pop();
+		 while(!sPuzzles.isEmpty()) {
+			puzzle=sPuzzles.pop();
 			if(puzzle.isOut()) {
+				if(isOpen)
+					 System.out.println(openList.keySet()+"\n\n");
 				 openList.remove(puzzle.toString(), puzzle);
-				// System.out.println("out: "+puzzle.getMove());
-				 //System.out.println("out\n"+puzzle);
 			 }
 			 else {
-				 //System.out.println("not out\n"+puzzle);
 				 puzzle.setOut(true);
-				 //System.out.println("newout: "+puzzle.getMove());
-				 frontiers.push(puzzle);
+				 sPuzzles.push(puzzle);
 				 children=childrenArr(puzzle);
-				 //System.out.println(children);
-				 //System.out.println(children.size());
 				 for (int i = 0; i < children.size(); i++) {
 					 child=children.get(i);
 			         f=child.getCost()+heuristic(child);
-			        // System.out.println(f);
 			         if(f>=t) {
 			        	 while(i<children.size()) {
-			            	// System.out.println("1: "+f+" , "+i+" ,"+child.getMove());
 			            	 children.remove(i);
 			             }
 			         }
-			         //System.out.println("start: "+f+" , "+i+" ,"+child.getMove());
 			         if(openList.containsKey(child.toString())) {
 			        	 temp=openList.get(child.toString());
 			             if(temp.isOut()) {
-			            	 //System.out.print(children.size()+"  ");
 			            	 children.remove(child);
-			            	 //System.out.println(children.size());
-			            	 //System.out.println("2: "+f+" , "+i+" ,"+child.getMove());
 			            	 i--;
 			            	 continue;
 			             }
 			             if(temp.getCost()+heuristic(temp)>f) {
-			            	 frontiers.remove(temp);
+			            	 sPuzzles.remove(temp);
 			            	 openList.remove(temp.toString(), temp);
-			            	 //System.out.println("3: "+f+" , "+i+" ,"+child.getMove());
 			             }
 			             else {
-			            	 //System.out.print(children.size()+"  ");
 			            	 children.remove(child);
-			            	// System.out.println("4: "+f+" , "+i+" ,"+child.getMove());
-			            	 //System.out.print(children.size());
 			            	 i--;
 			            	 continue;
 			             }
 			         }
 			         else if(isSolved(child)) {
-			        	 //System.out.println("open list\n"+openList);
-			             findPathOut(frontiers, child);
-			             //findPath(child);
+			             findPathOut(sPuzzles, child);
 			             cost=child.getCost();
 			             t=f;
 			             while(i<children.size()) {
-			            	// System.out.println("5: "+f+" , "+i+" ,"+child.getMove());
 			            	 children.remove(i);
 			             }
 			         }
 				 }
-				 //System.out.println();
 				 children= reverseChildren(children);
 	             for(int i=0; i<children.size(); i++) {
-	            	 //System.out.println(heuristic(children.get(i))+children.get(i).getCost());
-	            	 frontiers.push(children.get(i));
-	            	// System.out.println("peek: "+frontiers.peek().getMove());
+	            	 sPuzzles.push(children.get(i));
 		             openList.put(children.get(i).toString(), children.get(i));
 	                }
-	             //System.out.println();
 	             children.clear();
 				 }
 			 }
@@ -452,7 +470,18 @@ public class Algorithms {
 		        }
 		        return true;
 		 }
-	 
+		 
+		 /**
+		  * Change puzzle according to direction. 
+		  * @param puzzle- the puzzle state that going to be change.
+		  * @param direction- the direction to move the empty tile.
+		  * @return the new puzzle state.
+		  */ 
+		 private Puzzle newState(Puzzle puzzle,Puzzle.DIRECTION direction ) {
+			 count++;
+			 puzzle.move(direction);
+			 return puzzle;
+		 }
 		 
         //////////////////////////////////
         ////PATH FOR BFS DFID AND A*/////
@@ -494,9 +523,9 @@ public class Algorithms {
 	   * @param frontiers
 	   * @param puzzle- the puzzle of the goal we reached. Not in the stack
 	   */
-	  private void findPathOut(Stack<Puzzle> frontiers, Puzzle puzzle) {
+	  private void findPathOut(Stack<Puzzle> sPuzzles, Puzzle puzzle) {
 		 Stack<Puzzle> temp= new Stack<Puzzle>();
-		 temp.addAll(frontiers);
+		 temp.addAll(sPuzzles);
 		 ArrayList<String> moves= new ArrayList<String>();
 		 moves.add(puzzle.getMove());
 		 while(!temp.isEmpty()) {
@@ -561,11 +590,11 @@ public class Algorithms {
 	  * @param openList
 	  * @param puzzleToSolve
 	  */
-	 private void initIDA(Stack<Puzzle> frontiers, HashMap<String, Puzzle> openList, Puzzle puzzleToSolve){
+	 private void initIDA(Stack<Puzzle> sPuzzles, HashMap<String, Puzzle> openList, Puzzle puzzleToSolve){
 		 puzzleToSolve.setOut(false);
-		 frontiers.clear();
+		 sPuzzles.clear();
 		 openList.clear();
-		 frontiers.push(puzzleToSolve);
+		 sPuzzles.push(puzzleToSolve);
 		 openList.put(puzzleToSolve.toString(), puzzleToSolve);
 	 }
 	 
@@ -585,9 +614,10 @@ public class Algorithms {
 		 ArrayList<Puzzle> childrenArr=new ArrayList<Puzzle>();
 		 for (int i = 0; i < strategy.length; i++) {
 			 if (father!= null && father.canMove(strategy[i])) {
-	        		Puzzle newPuzzle = new Puzzle(father);
-	                count++;
-	                newPuzzle.move(strategy[i]);
+				 	Puzzle newPuzzle=newState(new Puzzle(father), strategy[i]);
+//	        		Puzzle newPuzzle = new Puzzle(father);
+//	                count++;
+//	                newPuzzle.move(strategy[i]);
 	                children.add(newPuzzle);
 			 }
 		 }

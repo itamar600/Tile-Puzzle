@@ -321,8 +321,8 @@ public class Puzzle {
     /////////////////////////////////////////////
     
     /**
-     * If the string is already done(ifStringYet=true) it is not done again, otherwise(ifStringYet=false) make a string of matrix of this state 
-     * and save it in puzzleString and change ifStringYet to true.
+     * If the string is already done(ifStringYet=true) it is not do string again, otherwise(ifStringYet=false) make a string of matrix of this state 
+     * and save it in puzzleString and changing ifStringYet to true.
      * @return string of matrix of this state
      */
     @Override

@@ -3,7 +3,7 @@ with time
 no open
 3x3
 Black:
-Red:7,1
+Red:
 _,7,2
 1,5,3
 4,8,6
