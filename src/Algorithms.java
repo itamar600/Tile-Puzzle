@@ -67,9 +67,6 @@ public class Algorithms {
 	        for (int i = 0; i < strategy.length; i++) {
 	        	if (puzzle.canMove(strategy[i])) {
 	        		Puzzle newPuzzle=newState(new Puzzle(puzzle), strategy[i]);
-//	        		Puzzle newPuzzle = new Puzzle(puzzle);
-//	                count++;
-//	                newPuzzle.move(strategy[i]);
 	                if(!openList.containsKey(newPuzzle.toString()) && !closeList.containsKey(newPuzzle.toString())) {
 	                	if (isSolved(newPuzzle)) {
 	                		findPath(newPuzzle);
@@ -142,9 +139,6 @@ public class Algorithms {
 		 for (int i = 0; i < strategy.length; i++) {
 	        	if (puzzle!= null && puzzle.canMove(strategy[i])) {
 	        		Puzzle newPuzzle=newState(new Puzzle(puzzle), strategy[i]);
-//	        		Puzzle newPuzzle = new Puzzle(puzzle);
-//	                count++;
-//	                newPuzzle.move(strategy[i]);
 	                if(!openList.containsKey(newPuzzle.toString())) {
 	                	result= limited_DFS(newPuzzle, depth-1, openList);
 	                	if(result!= null && result.equals("cutoff"))
@@ -201,9 +195,6 @@ public class Algorithms {
 			for (int i = 0; i < strategy.length; i++) {
 				 if (puzzle!= null && puzzle.canMove(strategy[i])) {
 					 	Puzzle newPuzzle=newState(new Puzzle(puzzle), strategy[i]);
-//		        		Puzzle newPuzzle = new Puzzle(puzzle);
-//		                count++;
-//		                newPuzzle.move(strategy[i]);
 		                if(!openList.containsKey(newPuzzle.toString()) && !closeList.containsKey(newPuzzle.toString())) {
 		                	pQPuzzles.add(newPuzzle);
 		            		openList.put(newPuzzle.toString(), newPuzzle);
@@ -269,9 +260,6 @@ public class Algorithms {
 					 for (int i = 0; i < strategy.length; i++) {
 						 if (puzzle!= null && puzzle.canMove(strategy[i])) {
 							 	Puzzle newPuzzle=newState(new Puzzle(puzzle), strategy[i]);
-//				        		Puzzle newPuzzle = new Puzzle(puzzle);
-//				                count++;
-//				                newPuzzle.move(strategy[i]);
 				                f=newPuzzle.getCost()+heuristic(newPuzzle);
 				                if(f>t) {
 				                	minF=Math.min(minF, f);
@@ -615,9 +603,6 @@ public class Algorithms {
 		 for (int i = 0; i < strategy.length; i++) {
 			 if (father!= null && father.canMove(strategy[i])) {
 				 	Puzzle newPuzzle=newState(new Puzzle(father), strategy[i]);
-//	        		Puzzle newPuzzle = new Puzzle(father);
-//	                count++;
-//	                newPuzzle.move(strategy[i]);
 	                children.add(newPuzzle);
 			 }
 		 }
